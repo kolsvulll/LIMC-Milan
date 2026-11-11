@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>LIMC 升温画像</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: single 960px column mirroring HuskyWeather's 画像 tab — month pills, stat cards, sun cards, summary, 2×2 chart grid */
+:root{
+  --bg:#05070a; --panel:#0e1114; --panel2:#14181c; --line:#232a30; --grid:#1b2126;
+  --fg:#f1f4f5; --muted:#8a949b; --dim:#5f6970;
+  --accent:#34d399; --accent-dim:#1f5a45; --neg:#ff3b30; --time:#7cc9ff;
+  --pill-on-bg:#f1f4f5; --pill-on-fg:#05070a;
+  --sans:"Inter",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#f5f7f6; --panel:#ffffff; --panel2:#f9fbfa; --line:#dde3e0; --grid:#e8edea;
+  --fg:#0d1512; --muted:#5b6762; --dim:#8b9691;
+  --accent:#0f9f6e; --accent-dim:#9fd9c2; --neg:#e0362c; --time:#2b8fd6;
+  --pill-on-bg:#0d1512; --pill-on-fg:#ffffff; color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f5f7f6; --panel:#ffffff; --panel2:#f9fbfa; --line:#dde3e0; --grid:#e8edea;
+  --fg:#0d1512; --muted:#5b6762; --dim:#8b9691;
+  --accent:#0f9f6e; --accent-dim:#9fd9c2; --neg:#e0362c; --time:#2b8fd6;
+  --pill-on-bg:#0d1512; --pill-on-fg:#ffffff; color-scheme:light}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header .st{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+header .st b{color:var(--accent);font-weight:500}
+h1{font-size:28px;margin:4px 0 0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:20px;margin:0;font-weight:700;text-wrap:balance}
+h3{font-size:18px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
+.months{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.months button{font:500 12.5px var(--sans);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer}
+.months button:hover{border-color:var(--muted)}
+.months button[aria-pressed="true"]{background:var(--pill-on-bg);color:var(--pill-on-fg);border-color:var(--pill-on-bg)}
+.months button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px;min-width:0}
+.card .k{font-size:11.5px;color:var(--muted)}
+.card .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.card .v.acc{color:var(--accent)}
+.card .v.mono{font-family:var(--mono);font-size:17px;font-weight:700}
+.card .n{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.sum{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:20px}
+.sum ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sum li{position:relative;padding-left:14px;font-size:13px}
+.sum li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.chart svg{width:100%;height:auto;display:block}
+.chart svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+details{font-size:12px;color:var(--muted)}
+details summary{cursor:pointer;user-select:none}
+details summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;width:100%}
+th,td{padding:3px 6px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;color:var(--fg)}
+th{color:var(--muted);font-weight:500}
+th:first-child,td:first-child{text-align:left}
+.foot{font-size:12px;color:var(--muted);margin:-6px 0 0}
+.src{font-size:11.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:14px}
+.src a{color:var(--muted)}
+.tip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--line);color:var(--fg);font:500 11.5px var(--mono);padding:5px 8px;border-radius:3px;z-index:20;white-space:nowrap}
+@media (max-width:720px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a href="./" style="font-size:12.5px;color:var(--muted);text-decoration:none">← 全部站点</a>
+    <div class="st">IT · <b>LIMC</b> · Milan Malpensa · Europe/Rome</div>
+    <h1>升温画像</h1>
+    <p class="sub">基于多年历史 METAR 学习出的站点升温规律。</p>
+    <div class="months" id="months" role="group" aria-label="选择月份"></div>
+  </header>
+
+  <section class="cards" id="statCards"></section>
+
+  <section>
+    <h2>太阳</h2>
+    <p class="sub">当地时间，从本月 1 日到月末。</p>
+    <div class="cards" id="sunCards" style="margin-top:12px"></div>
+  </section>
+
+  <section class="sum">
+    <h2>一句话总结</h2>
+    <ul id="summary"></ul>
+  </section>
+
+  <section class="grid">
+    <div class="chart">
+      <h3>当日最高通常出现的时间</h3>
+      <div id="cHTD"></div>
+      <details><summary>查看数值</summary><div class="tbl" id="tHTD"></div></details>
+    </div>
+    <div class="chart">
+      <h3>每个小时之后还剩多少升温</h3>
+      <p class="sub" style="margin:0">在给定当地小时之后，平均还会升温多少度，以及出现新高的概率。</p>
+      <div class="legend"><span><i style="background:var(--accent-dim)"></i>平均剩余升温 °C（左轴）</span><span><i style="background:var(--accent);height:3px;vertical-align:3px"></i>之后出现新高概率（右轴）</span></div>
+      <div id="cHour"></div>
+      <details><summary>查看数值</summary><div class="tbl" id="tHour"></div></details>
+    </div>
+    <div class="chart">
+      <h3>哪种风让白天更暖</h3>
+      <p class="sub" style="margin:0">各风向下，当日最高温比平常高或低多少 —— 已按季节内时间校正。</p>
+      <div id="cWarm"></div>
+      <details><summary>查看数值</summary><div class="tbl" id="tWarm"></div></details>
+    </div>
+    <div class="chart">
+      <h3>最高温出现时间 — 按风向</h3>
+      <p class="sub" style="margin:0">各风向下，当日最高温比平常提前（−）或推迟（+）多少。</p>
+      <div id="cShift"></div>
+      <details><summary>查看数值</summary><div class="tbl" id="tShift"></div></details>
+    </div>
+  </section>
+  <p class="foot" id="foot"></p>
+
+  <p class="src">数据提取自 <a href="https://huskyweather.com/station/LIMC" target="_blank" rel="noopener">huskyweather.com/station/LIMC</a> 的「画像」标签，2026-11-11。数据窗口 2021-11-08 至 2026-11-07，IEM ASOS METAR，87,168 条报文、1,826 天。</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const HOURS=[8,9,10,11,12,13,14,15,16,17,18,19,20];
+const DIRS=["北","东北","东","东南","南","西南","西","西北"];
+// per month: rate, tmax, p10, p90, rec, recDate, range, peak, peakLo, peakHi, days, years,
+// sun [rise1,riseN,set1,setN,noonMid,len1,lenN], htd[7], gain[13 for 08..20], prob[13], warm[8], shift[8], wdays[8], summary[]
+const D={
+1:{rate:2.39,tmax:8.55,p10:5,p90:12,rec:21,recY:2024,range:9.52,peak:"13:30",pr:["12:50","14:50"],days:155,yrs:"2022–2026",
+ sun:["08:05","07:49","16:51","17:28","12:34","08:45","09:39"],htd:[0.6,12.3,47.1,37.4,1.9,0,0.6],
+ gain:[6.17,6.06,4.8,3.08,1.95,1.08,0.52,0.15,0.04,0.03,0.01,0.01,0.01],prob:[94.8,94.8,92.9,90.3,85.2,63.2,40,11,2.6,1.3,0.6,0.6,0.6],
+ warm:[-0.25,1.18,-0.65,0.31,-0.58,0.07,0.28,0.26],shift:[-0.09,-1.08,-0.25,-0.07,-0.27,0.09,0.66,0.04],wd:[76,21,28,55,53,130,59,26],
+ s:["最高温通常在 13:30 左右；半数日子在 12:50 至 14:50 之间","即太阳正午（12:34）之后 55 分钟","典型最高 ≈ 9°C，日较差 ≈ 9.5°C","到 14:00，半数日子的最高温已出现；到 16:00，十天中有九天已出现","本月白天风向对最高温影响不大","相对提前一天的预报（平均 +1.4°）：吹东南风时偏低（+0.7°）。详见「模型差」标签"]},
+2:{rate:2.72,tmax:12.28,p10:7,p90:16,rec:22,recY:2023,range:11.09,peak:"14:00",pr:["13:20","14:50"],days:141,yrs:"2022–2026",
+ sun:["07:47","07:07","17:29","18:09","12:39","09:42","11:01"],htd:[2.1,7.1,39,48.2,3.5,0,0],
+ gain:[7.48,6.95,4.86,3.32,2.04,1.28,0.64,0.21,0.04,0,0,0,0],prob:[95.7,95,95,91.5,90.1,79.4,51.8,19.1,3.5,0,0,0,0],
+ warm:[-1.01,1.89,-1.43,-0.11,0.34,0.31,0.31,0.19],shift:[-0.29,-0.66,-0.62,0.02,-0.28,0.12,0.7,0.25],wd:[70,17,26,69,65,121,60,23],
+ s:["最高温通常在 14:00 左右；半数日子在 13:20 至 14:50 之间","即太阳正午（12:39）之后 1 小时 25 分","典型最高 ≈ 12°C，日较差 ≈ 11.1°C","到 15:00，半数日子的最高温已出现；到 16:00，十天中有九天已出现","白天吹东风时比常年偏冷（−1.4°）","相对提前一天的预报（平均 +1.1°）：吹西风时偏高（+1.6°）。详见「模型差」标签"]},
+3:{rate:2.54,tmax:14.99,p10:10,p90:20,rec:22,recY:2022,range:11.14,peak:"14:20",pr:["13:20","15:20"],days:155,yrs:"2022–2026",
+ sun:["07:06","07:09","18:10","19:50","12:35","11:05","12:41"],htd:[2.6,6.5,32.3,50.3,7.7,0.6,0],
+ gain:[7.22,5.61,4.06,2.86,1.97,1.29,0.74,0.36,0.09,0.02,0.01,0,0],prob:[94.8,94.8,94.2,93.5,90.3,82.6,58.7,32.9,8.4,1.9,0.6,0,0],
+ warm:[-2.06,0.15,-2.28,-0.07,1.13,1.13,0.17,-0.17],shift:[-0.65,-0.49,-0.61,0.08,-0.01,0.14,0.62,0.22],wd:[62,13,30,94,78,93,61,15],
+ s:["最高温通常在 14:20 左右；半数日子在 13:20 至 15:20 之间","即太阳正午（12:35）之后 1 小时 40 分","典型最高 ≈ 15°C，日较差 ≈ 11.1°C","到 15:00，半数日子的最高温已出现；到 16:00，十天中有九天已出现","白天吹西南风时比常年偏暖（+1.1°），吹东风时偏冷（−2.3°）","相对提前一天的预报（平均 +1.1°）：吹西风时偏高（+1.6°）。详见「模型差」标签"]},
+4:{rate:2.67,tmax:19.4,p10:14,p90:24,rec:27,recY:2024,range:12.27,peak:"15:25",pr:["14:50","16:20"],days:150,yrs:"2022–2026",
+ sun:["07:07","06:16","19:52","20:29","13:25","12:44","14:13"],htd:[1.3,5.3,10,48.7,34,0.7,0],
+ gain:[7.86,6.75,5.22,3.97,2.92,2.1,1.4,0.82,0.39,0.11,0.01,0,0],prob:[96.7,96.7,96,94,92.7,89.3,83.3,65.3,34.7,10.7,0.7,0,0],
+ warm:[-3.22,-1.05,-2.45,0.02,1.36,1.5,0.71,-0.08],shift:[-0.83,-0.45,-0.54,0.09,0.11,0.28,0.6,0.22],wd:[67,14,34,92,99,98,44,12],
+ s:["最高温通常在 15:25 左右；半数日子在 14:50 至 16:20 之间","即太阳正午（13:25）之后 2 小时","典型最高 ≈ 19°C，日较差 ≈ 12.3°C","到 16:00，半数日子的最高温已出现；到 18:00，十天中有九天已出现","白天吹西南风时比常年偏暖（+1.5°），吹北风时偏冷（−3.2°）"]},
+5:{rate:2.1,tmax:22.86,p10:17,p90:29,rec:33,recY:2026,range:10.34,peak:"15:20",pr:["14:50","16:20"],days:155,yrs:"2022–2026",
+ sun:["06:14","05:40","20:30","21:05","13:21","14:16","15:24"],htd:[1.3,6.5,12.3,41.9,35.5,2.6,0],
+ gain:[6.93,5.69,4.5,3.51,2.74,2,1.32,0.75,0.4,0.12,0.03,0.01,0],prob:[96.8,96.8,96.1,94.8,91,86.5,79.4,61.3,38.1,11.6,2.6,0.6,0],
+ warm:[-3.22,-2.12,-1.9,0.2,0.4,1.44,1.28,-0.6],shift:[-0.84,-0.93,-0.55,-0.06,0.27,0.34,0.24,-0.06],wd:[59,12,34,74,100,112,52,11],
+ s:["最高温通常在 15:20 左右；半数日子在 14:50 至 16:20 之间","即太阳正午（13:21）之后 2 小时","典型最高 ≈ 23°C，日较差 ≈ 10.3°C","到 16:00，半数日子的最高温已出现；到 18:00，十天中有九天已出现","白天吹西南风时比常年偏暖（+1.4°），吹北风时偏冷（−3.2°）"]},
+6:{rate:2.13,tmax:28.85,p10:24,p90:34,rec:36,recY:2026,range:11.22,peak:"15:20",pr:["14:20","16:20"],days:150,yrs:"2022–2026",
+ sun:["05:40","05:38","21:06","21:18","13:25","15:26","15:40"],htd:[0.7,3.3,18,44.7,30,3.3,0],
+ gain:[7.27,5.99,4.73,3.64,2.65,1.87,1.13,0.69,0.38,0.13,0.06,0.01,0],prob:[99.3,99.3,98,98,96,92,78,57.3,33.3,10,3.3,0.7,0],
+ warm:[-3.01,-1.4,-1.09,0.17,-0.08,1.02,1.31,0.54],shift:[-0.66,-0.47,-0.23,-0.2,0.4,0.1,0.04,0.21],wd:[52,15,35,61,101,128,56,11],
+ s:["最高温通常在 15:20 左右；半数日子在 14:20 至 16:20 之间","即太阳正午（13:25）之后 1 小时 55 分","典型最高 ≈ 29°C，日较差 ≈ 11.2°C","到 16:00，半数日子的最高温已出现；到 17:00，十天中有九天已出现","白天吹西风时比常年偏暖（+1.3°），吹北风时偏冷（−3.0°）","相对提前一天的预报（平均 +0.6°）：吹南风时偏高（+1.0°）。详见「模型差」标签"]},
+7:{rate:2.19,tmax:31.03,p10:27,p90:34,rec:38,recY:2022,range:11.55,peak:"15:25",pr:["14:20","16:20"],days:155,yrs:"2022–2026",
+ sun:["05:39","06:06","21:18","20:57","13:31","15:39","14:50"],htd:[0,2.6,16.8,44.5,31,5.2,0],
+ gain:[7.52,6.4,5.1,3.89,2.88,2.08,1.37,0.79,0.42,0.14,0.05,0.01,0],prob:[98.1,98.1,98.1,97.4,95.5,92.9,80,58.1,36.1,12.9,5.2,0.6,0],
+ warm:[-1.95,-1.17,-0.41,-0.1,-0.45,0.74,0.86,0.5],shift:[-0.29,0.16,-0.22,-0.35,0.26,-0.06,0.14,0.35],wd:[37,18,41,59,98,124,67,14],
+ s:["最高温通常在 15:25 左右；半数日子在 14:20 至 16:20 之间","即太阳正午（13:31）之后 1 小时 55 分","典型最高 ≈ 31°C，日较差 ≈ 11.6°C","到 16:00，半数日子的最高温已出现；到 18:00，十天中有九天已出现","白天吹西风时比常年偏暖（+0.9°），吹北风时偏冷（−1.9°）","相对提前一天的预报（平均 +0.7°）：吹南风时偏高（+1.3°），吹西南风时偏低（+0.3°）。详见「模型差」标签"]},
+8:{rate:2.34,tmax:30.9,p10:26,p90:35,rec:37,recY:2023,range:11.55,peak:"15:15",pr:["14:20","15:50"],days:155,yrs:"2022–2026",
+ sun:["06:08","06:44","20:56","20:08","13:30","14:48","13:24"],htd:[0,1.3,16.1,58.7,21.3,2.6,0],
+ gain:[8.06,6.97,5.33,4.05,2.86,2,1.26,0.68,0.33,0.1,0.03,0,0],prob:[100,99.4,99.4,98.7,98.1,96.1,82.6,51,23.9,9.7,2.6,0,0],
+ warm:[-2.22,-0.78,-0.61,-0.18,0.24,0.61,1.01,1.03],shift:[-0.36,0.14,-0.04,-0.23,0.28,-0.27,0.39,0.24],wd:[43,26,57,66,89,96,66,16],
+ s:["最高温通常在 15:15 左右；半数日子在 14:20 至 15:50 之间","即太阳正午（13:30）之后 1 小时 45 分","典型最高 ≈ 31°C，日较差 ≈ 11.6°C","到 16:00，半数日子的最高温已出现；到 17:00，十天中有九天已出现","白天吹西风时比常年偏暖（+1.0°），吹北风时偏冷（−2.2°）","相对提前一天的预报（平均 +0.8°）：吹南风时偏高（+1.3°），吹西南风时偏低（+0.4°）。详见「模型差」标签"]},
+9:{rate:2.15,tmax:25.01,p10:21,p90:30,rec:33,recY:2024,range:9.97,peak:"15:10",pr:["14:20","15:50"],days:150,yrs:"2022–2026",
+ sun:["06:45","07:20","20:06","19:10","13:20","13:21","11:49"],htd:[2,3.3,17.3,54.7,22,0.7,0],
+ gain:[7.04,6.37,5.04,3.74,2.65,1.8,1.17,0.65,0.24,0.09,0.01,0,0],prob:[95.3,95.3,95.3,94,92.7,90,76,54.7,22.7,8.7,0.7,0,0],
+ warm:[-1.81,-0.94,-0.49,-0.35,0.12,0.86,1.13,1.83],shift:[-0.25,-0.36,-0.1,0.01,0.05,-0.06,0.47,0.13],wd:[54,30,65,68,74,91,59,17],
+ s:["最高温通常在 15:10 左右；半数日子在 14:20 至 15:50 之间","即太阳正午（13:20）之后 1 小时 50 分","典型最高 ≈ 25°C，日较差 ≈ 10.0°C","到 16:00，半数日子的最高温已出现；到 17:00，十天中有九天已出现","白天吹西风时比常年偏暖（+1.1°），吹北风时偏冷（−1.8°）","相对提前一天的预报（平均 +0.9°）：吹西南风时偏低（+0.5°）。详见「模型差」标签"]},
+10:{rate:2.07,tmax:19.91,p10:16,p90:24,rec:29,recY:2023,range:8.91,peak:"14:25",pr:["13:20","15:40"],days:155,yrs:"2022–2026",
+ sun:["07:22","07:02","19:08","17:15","13:11","11:46","10:13"],htd:[2.6,6.5,32.3,46.5,11,0.6,0.6],
+ gain:[6.14,5.88,4.66,3.31,2.26,1.41,0.75,0.37,0.13,0.04,0.02,0.01,0.01],prob:[96.1,96.1,95.5,94.8,91,79.4,58.7,35.5,12.3,3.2,1.3,1.3,0.6],
+ warm:[-1.1,-0.68,-0.56,-0.33,0.46,0.22,1.25,2.08],shift:[-0.15,-0.91,0.05,-0.11,0.09,0.01,0.54,0.13],wd:[68,29,56,71,57,99,60,14],
+ s:["最高温通常在 14:25 左右；半数日子在 13:20 至 15:40 之间","即太阳正午（13:11）之后 1 小时 25 分","典型最高 ≈ 20°C，日较差 ≈ 8.9°C","到 15:00，半数日子的最高温已出现；到 17:00，十天中有九天已出现","白天吹西风时比常年偏暖（+1.3°），吹北风时偏冷（−1.1°）","相对提前一天的预报（平均 +1.0°）：吹西风时偏高（+1.4°）。详见「模型差」标签"]},
+11:{rate:2.45,tmax:12.84,p10:8.9,p90:17,rec:20,recY:2022,range:9.93,peak:"13:10",pr:["12:20","14:10"],days:150,yrs:"2021–2026",
+ sun:["07:04","07:44","17:14","16:44","12:10","10:10","09:01"],htd:[0,18.7,56,24.7,0,0.7,0],
+ gain:[6.13,5.61,3.94,2.45,1.47,0.74,0.28,0.06,0.01,0.01,0.01,0.01,0],prob:[95.3,95.3,93.3,90.7,80,53.3,25.3,5.3,0.7,0.7,0.7,0.7,0],
+ warm:[-0.34,-0.63,-0.31,-0.08,0.04,0.09,0.55,1.72],shift:[0.03,-1.23,0.12,-0.09,-0.11,0.05,0.52,0.1],wd:[76,27,42,68,53,122,52,16],
+ s:["最高温通常在 13:10 左右；半数日子在 12:20 至 14:10 之间","即太阳正午（12:10）之后 1 小时","典型最高 ≈ 13°C，日较差 ≈ 9.9°C","到 14:00，半数日子的最高温已出现；到 15:00，十天中有九天已出现","本月白天风向对最高温影响不大"]},
+12:{rate:2.39,tmax:9.79,p10:5,p90:14,rec:20,recY:2023,range:9.48,peak:"13:25",pr:["12:50","14:20"],days:155,yrs:"2021–2025",
+ sun:["07:45","08:05","16:44","16:50","12:20","08:59","08:44"],htd:[0.6,13.5,56.1,28.4,0,0.6,0.6],
+ gain:[6.14,6.01,4.93,3.04,1.85,1.03,0.41,0.05,0.01,0.01,0.01,0.01,0.01],prob:[96.8,96.8,95.5,93.5,85.2,67.1,29.7,4.5,1.3,1.3,1.3,1.3,0.6],
+ warm:[0,0.69,-0.39,0.2,-0.06,-0.32,0.56,0.32],shift:[0.07,-1.13,0.02,-0.38,-0.28,0.09,0.72,0.12],wd:[80,24,29,54,54,139,54,23],
+ s:["最高温通常在 13:25 左右；半数日子在 12:50 至 14:20 之间","即太阳正午（12:20）之后 1 小时 5 分","典型最高 ≈ 10°C，日较差 ≈ 9.5°C","到 14:00，半数日子的最高温已出现；到 15:00，十天中有九天已出现","本月白天风向对最高温影响不大"]}
+};
+
+const $=id=>document.getElementById(id);
+const tip=$("tip");
+const NS="http://www.w3.org/2000/svg";
+function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function tipOn(e,txt){e.addEventListener("pointermove",ev=>{tip.textContent=txt;tip.hidden=false;const w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+12,innerWidth-w-8)+"px";tip.style.top=(ev.clientY-30)+"px"});e.addEventListener("pointerleave",()=>tip.hidden=true)}
+function niceStep(span,n){const r=span/n,p=Math.pow(10,Math.floor(Math.log10(r))),m=r/p;return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p}
+function fmt(v){return Math.abs(v)<1e-9?"0":(Math.round(v*100)/100).toString()}
+
+// signed bar chart (wind)
+function signedBars(host,vals,colorFn,unit){
+  host.innerHTML="";
+  const W=440,H=200,L=40,R=8,T=10,B=26,pw=W-L-R,ph=H-T-B;
+  let lo=Math.min(0,...vals),hi=Math.max(0,...vals);
+  const step=niceStep(Math.max(hi-lo,0.5),4);
+  lo=Math.floor(lo/step)*step;hi=Math.ceil(hi/step)*step;if(hi===lo)hi=lo+step;
+  const y=v=>T+(hi-v)/(hi-lo)*ph;
+  const s=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"},host);
+  for(let v=lo;v<=hi+1e-9;v+=step){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:Math.abs(v)<1e-9?"var(--dim)":"var(--grid)","stroke-width":1},s);el("text",{x:L-6,y:y(v)+3,"text-anchor":"end"},s).textContent=fmt(v)}
+  el("line",{x1:L,x2:L,y1:T,y2:T+ph,stroke:"var(--line)"},s);
+  const bw=pw/vals.length;
+  vals.forEach((v,i)=>{const x=L+i*bw+bw*0.15,top=y(Math.max(v,0)),h=Math.max(Math.abs(y(v)-y(0)),v===0?0:1);
+    const r=el("rect",{x,y:top,width:bw*0.7,height:h,fill:colorFn(v)},s);
+    const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);
+    tipOn(hit,`${DIRS[i]}  ${v>0?"+":""}${v}${unit}`);
+    el("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"},s).textContent=DIRS[i]});
+}
+
+function htdChart(host,vals){
+  host.innerHTML="";
+  const labs=["<09","09-12","12-14","14-16","16-18","18-20","20+"];
+  const W=440,H=200,L=40,R=8,T=10,B=26,pw=W-L-R,ph=H-T-B;
+  const hi=Math.max(15,Math.ceil(Math.max(...vals)/15)*15);
+  const y=v=>T+(hi-v)/hi*ph;
+  const s=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"},host);
+  for(let v=0;v<=hi;v+=15){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:"var(--grid)"},s);el("text",{x:L-6,y:y(v)+3,"text-anchor":"end"},s).textContent=v+"%"}
+  el("line",{x1:L,x2:L,y1:T,y2:T+ph,stroke:"var(--line)"},s);
+  const mx=Math.max(...vals),bw=pw/vals.length;
+  vals.forEach((v,i)=>{el("rect",{x:L+i*bw+bw*0.15,y:y(v),width:bw*0.7,height:y(0)-y(v),fill:v===mx?"var(--accent)":"var(--accent-dim)"},s);
+    const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);tipOn(hit,`${labs[i]}  ${v}%`);
+    el("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"},s).textContent=labs[i]});
+}
+
+function hourChart(host,gain,prob){
+  host.innerHTML="";
+  const idx=HOURS.map((h,i)=>i).filter(i=>HOURS[i]>=9&&HOURS[i]<=19);
+  const W=440,H=200,L=26,R=38,T=10,B=26,pw=W-L-R,ph=H-T-B;
+  const g=idx.map(i=>gain[i]),p=idx.map(i=>prob[i]);
+  const gh=Math.max(2,Math.ceil(Math.max(...g)/2)*2);
+  const yg=v=>T+(gh-v)/gh*ph, yp=v=>T+(100-v)/100*ph;
+  const s=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"},host);
+  for(let v=0;v<=gh;v+=2){el("line",{x1:L,x2:W-R,y1:yg(v),y2:yg(v),stroke:"var(--grid)"},s);el("text",{x:L-6,y:yg(v)+3,"text-anchor":"end"},s).textContent=v}
+  for(let v=0;v<=100;v+=25){el("text",{x:W-R+6,y:yp(v)+3},s).textContent=v+"%"}
+  el("line",{x1:L,x2:L,y1:T,y2:T+ph,stroke:"var(--line)"},s);el("line",{x1:W-R,x2:W-R,y1:T,y2:T+ph,stroke:"var(--line)"},s);
+  const bw=pw/g.length,cx=i=>L+i*bw+bw/2;
+  g.forEach((v,i)=>el("rect",{x:L+i*bw+bw*0.12,y:yg(v),width:bw*0.76,height:yg(0)-yg(v),fill:"var(--accent-dim)"},s));
+  // smooth line through probability points
+  const pts=p.map((v,i)=>[cx(i),yp(v)]);let d=`M${pts[0][0]},${pts[0][1]}`;
+  for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1=[p1[0]+(p2[0]-p0[0])/6,p1[1]+(p2[1]-p0[1])/6],c2=[p2[0]-(p3[0]-p1[0])/6,p2[1]-(p3[1]-p1[1])/6];
+    d+=` C${c1[0]},${Math.min(Math.max(c1[1],T),T+ph)} ${c2[0]},${Math.min(Math.max(c2[1],T),T+ph)} ${p2[0]},${p2[1]}`}
+  el("path",{d,fill:"none",stroke:"var(--accent)","stroke-width":1.8},s);
+  pts.forEach(q=>el("circle",{cx:q[0],cy:q[1],r:3,fill:"var(--accent)"},s));
+  idx.forEach((hi,i)=>{const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);
+    tipOn(hit,`${String(HOURS[hi]).padStart(2,"0")}:00 后  +${gain[hi]}°C · 新高 ${prob[hi]}%`);
+    el("text",{x:cx(i),y:H-8,"text-anchor":"middle","font-size":9},s).textContent=String(HOURS[hi]).padStart(2,"0")+":00"});
+}
+
+function table(host,head,rows){host.innerHTML="<table><thead><tr>"+head.map(h=>`<th>${h}</th>`).join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("")+"</tbody></table>"}
+const sgn=v=>v>0?"+"+v:String(v);
+
+function render(m){
+  const d=D[m];
+  document.querySelectorAll("#months button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m==m?"true":"false"));
+  $("statCards").innerHTML=`
+   <div class="card"><div class="k">峰值升温速率</div><div class="v acc">${d.rate.toFixed(2)}°C/h</div></div>
+   <div class="card"><div class="k">典型最高</div><div class="v">${Math.round(d.tmax)}°C</div><div class="n">通常 ${Math.round(d.p10)}–${Math.round(d.p90)}°C · 纪录 ${d.rec}°C（${d.recY}）</div></div>
+   <div class="card"><div class="k">常见峰值</div><div class="v">${d.peak}</div><div class="n">半数日子 ${d.pr[0]}–${d.pr[1]}</div></div>
+   <div class="card"><div class="k">样本</div><div class="v">${d.days} 天</div><div class="n">${d.yrs}</div></div>`;
+  const lag=d.s[1].split("之后 ")[1];
+  $("sunCards").innerHTML=`
+   <div class="card"><div class="k">日出</div><div class="v mono">${d.sun[0]}→${d.sun[1]}</div></div>
+   <div class="card"><div class="k">日落</div><div class="v mono">${d.sun[2]}→${d.sun[3]}</div></div>
+   <div class="card"><div class="k">太阳正午</div><div class="v mono">${d.sun[4]}</div><div class="n" style="font-family:var(--sans)">最高温约晚 ${lag}</div></div>
+   <div class="card"><div class="k">昼长（时:分）</div><div class="v mono">${d.sun[5]}→${d.sun[6]}</div></div>`;
+  $("summary").innerHTML=d.s.map(t=>`<li>${t}</li>`).join("");
+  htdChart($("cHTD"),d.htd);
+  table($("tHTD"),["时段","<09","09–12","12–14","14–16","16–18","18–20","20+"],[["占比 %",...d.htd]]);
+  hourChart($("cHour"),d.gain,d.prob);
+  table($("tHour"),["当地时刻","剩余升温 °C","之后新高概率 %"],HOURS.map((h,i)=>[String(h).padStart(2,"0")+":00",d.gain[i],d.prob[i]]));
+  signedBars($("cWarm"),d.warm,v=>v>=0?"var(--accent)":"var(--neg)","°C");
+  signedBars($("cShift"),d.shift,()=>"var(--time)"," h");
+  table($("tWarm"),["风向","最高温距平 °C","样本天数"],DIRS.map((n,i)=>[n,sgn(d.warm[i]),d.wd[i]]));
+  table($("tShift"),["风向","峰值时间偏移 h","样本天数"],DIRS.map((n,i)=>[n,sgn(d.shift[i]),d.wd[i]]));
+  const a=m===1?12:m-1,b=m===12?1:m+1;
+  $("foot").textContent=`风向为白天升温时段（当地11–16时）的主导风；合并 ${a}月–${b}月 的数据，以保证每个方向有足够天数。`;
+  try{localStorage.setItem("limc-month",m)}catch(e){}
+}
+
+const mb=$("months");
+for(let m=1;m<=12;m++){const b=document.createElement("button");b.type="button";b.id="m"+m;b.dataset.m=m;b.textContent=m+"月";b.addEventListener("click",()=>render(m));mb.appendChild(b)}
+let start=11;try{const v=+localStorage.getItem("limc-month");if(v>=1&&v<=12)start=v}catch(e){}
+render(start);
+</script>
+
+</body>
+</html>

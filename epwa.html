@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EPWA 华沙 · 站点数据</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#05070a; --panel:#0e1114; --panel2:#14181c; --line:#232a30; --grid:#1b2126;
+  --fg:#f1f4f5; --muted:#8a949b; --dim:#5f6970;
+  --accent:#34d399; --accent-dim:#1f5a45; --neg:#ff3b30; --time:#7cc9ff; --warn:#f5b84a;
+  --sans:"Inter",system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.5}
+a{color:var(--accent)}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px 56px;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.back{font-size:12.5px;color:var(--muted);text-decoration:none}
+.back:hover{color:var(--fg)}
+h1{font-size:30px;margin:4px 0 0;font-weight:700}
+.meta{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.meta b{color:var(--accent);font-weight:500}
+.now{text-align:right}
+.now .t{font-size:34px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.now .s{font-size:12px;color:var(--muted)}
+.notice{background:#1a1407;border:1px solid #4a3a12;color:#f0d9a6;border-radius:4px;padding:10px 14px;font-size:12.5px}
+nav.tabs{display:flex;gap:2px;overflow-x:auto;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+nav.tabs button{font:500 13px var(--sans);color:var(--muted);background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+nav.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+h2{font-size:20px;margin:0;font-weight:700}
+h3{font-size:17px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:12.5px;margin:4px 0 0}
+.panel{display:flex;flex-direction:column;gap:18px}
+.shots{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.shots img{display:block;width:100%;height:auto}
+.caption{font-size:12px;color:var(--muted)}
+details.box{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:12px 16px}
+details.box>summary{cursor:pointer;font-weight:600;font-size:13.5px}
+pre.txt{white-space:pre-wrap;word-break:break-word;font-family:var(--sans);font-size:12.5px;color:var(--fg);margin:12px 0 0;max-height:520px;overflow:auto}
+.tree{font-family:var(--mono);font-size:12px;margin-top:10px;max-height:640px;overflow:auto}
+.tree details{margin-left:14px}
+.tree summary{cursor:pointer;color:var(--muted)}
+.tree summary .k{color:var(--time)}
+.tree .row{margin-left:14px;white-space:pre-wrap;word-break:break-all}
+.tree .k{color:var(--time)}
+.tree .s{color:#c3e88d}.tree .n{color:#f78c6c}.tree .b{color:#c792ea}
+/* profile */
+.months{display:flex;flex-wrap:wrap;gap:6px}
+.months button{font:500 12.5px var(--sans);color:var(--fg);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer}
+.months button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px;min-width:0}
+.card .k{font-size:11.5px;color:var(--muted)}
+.card .v{font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.card .v.acc{color:var(--accent)}
+.card .v.mono{font-family:var(--mono);font-size:17px}
+.card .n{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+.sum{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:20px}
+.sum ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sum li{position:relative;padding-left:14px;font-size:13px}
+.sum li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.chart{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.chart svg{width:100%;height:auto;display:block}
+.chart svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+details.vals{font-size:12px;color:var(--muted)}
+details.vals summary{cursor:pointer}
+.tbl{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;font-family:var(--mono);font-size:11px;font-variant-numeric:tabular-nums;width:100%}
+th,td{padding:3px 6px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;color:var(--fg)}
+th{color:var(--muted);font-weight:500}
+th:first-child,td:first-child{text-align:left}
+.foot{font-size:12px;color:var(--muted)}
+.tip{position:fixed;pointer-events:none;background:var(--panel);border:1px solid var(--line);color:var(--fg);font:500 11.5px var(--mono);padding:5px 8px;border-radius:3px;z-index:20;white-space:nowrap}
+.src{font-size:11.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:14px}
+.loading{color:var(--muted);padding:40px 0;text-align:center}
+@media (max-width:720px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← 全部站点</a>
+  <div class="top">
+    <div>
+      <div class="meta">PL · <b>EPWA</b> · Warsaw Chopin · Europe/Warsaw</div>
+      <h1>Warsaw</h1>
+      <div class="meta" id="captured"></div>
+    </div>
+    <div class="now"><div class="t" id="nowT">—</div><div class="s" id="nowS"></div></div>
+  </div>
+  <div class="notice" id="liveNote">画像、模型差、模式里的历史统计长期有效；概览、今日 METAR、附近 PWS、TAF、降水、云图、聪明钱是抓取那一刻的快照，不会自动变化。</div>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <main id="main"><div class="loading">正在载入数据…</div></main>
+  <p class="src">数据提取自 <a href="https://huskyweather.com/station/EPWA" target="_blank" rel="noopener">huskyweather.com/station/EPWA</a>。原始数据文件：<a href="epwa-data.json">epwa-data.json</a>。</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const TABS=[
+ {id:"overview",name:"概览",eps:["snapshot"],shots:2},
+ {id:"models",name:"模式",eps:["models","model-bias"],shots:5},
+ {id:"profile",name:"画像",eps:["passport"],shots:0},
+ {id:"edge",name:"模型差",eps:["edge","model-bias"],shots:4},
+ {id:"metar",name:"今日 METAR",eps:["metars"],shots:3},
+ {id:"pws",name:"附近 PWS",eps:["nearby"],shots:2},
+ {id:"taf",name:"TAF",eps:["snapshot.taf"],shots:2},
+ {id:"radar",name:"降水",eps:["radar"],shots:2},
+ {id:"clouds",name:"云图",eps:["clouds"],shots:2},
+ {id:"smart",name:"聪明钱",eps:["smart-traders"],shots:3}
+];
+const DIRS=[["N","北"],["NE","东北"],["E","东"],["SE","东南"],["S","南"],["SW","西南"],["W","西"],["NW","西北"]];
+const HOURS=[8,9,10,11,12,13,14,15,16,17,18,19,20];
+let DATA=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- JSON tree (lazy) ---------- */
+function tree(v,key){
+  const wrap=document.createElement("div");
+  const label=key!==undefined?`<span class="k">${esc(key)}</span>: `:"";
+  if(v!==null&&typeof v==="object"){
+    const d=document.createElement("details");
+    const n=Array.isArray(v)?`[${v.length}]`:`{${Object.keys(v).length}}`;
+    d.innerHTML=`<summary>${label}${n}</summary>`;
+    let done=false;
+    d.addEventListener("toggle",()=>{if(d.open&&!done){done=true;const ks=Object.keys(v);for(const k of ks)d.appendChild(tree(v[k],k))}});
+    wrap.appendChild(d);
+  }else{
+    const r=document.createElement("div");r.className="row";
+    const cls=typeof v==="string"?"s":typeof v==="number"?"n":"b";
+    r.innerHTML=`${label}<span class="${cls}">${esc(typeof v==="string"?JSON.stringify(v):String(v))}</span>`;
+    wrap.appendChild(r);
+  }
+  return wrap;
+}
+function getEp(path){const [e,...rest]=path.split(".");let v=DATA.endpoints[e];for(const r of rest)v=v?.[r];return v}
+
+/* ---------- generic tab ---------- */
+function renderGeneric(t){
+  const m=$("main");m.innerHTML="";
+  const p=document.createElement("div");p.className="panel";
+  if(t.shots){
+    const h=document.createElement("div");
+    h.innerHTML=`<div class="caption">网站上该标签的样子（抓取时刻 ${esc(DATA.captured_local)}）</div>`;
+    const s=document.createElement("div");s.className="shots";
+    for(let i=1;i<=t.shots;i++){const img=new Image();img.src=`epwa-${t.id}-${i}.jpg`;img.alt=`${t.name} 截图 ${i}`;img.loading=i>1?"lazy":"eager";s.appendChild(img)}
+    h.appendChild(s);p.appendChild(h);
+  }
+  const txt=DATA.tab_text[t.name];
+  if(txt){const d=document.createElement("details");d.className="box";d.open=true;
+    d.innerHTML=`<summary>页面上的全部文字</summary><pre class="txt">${esc(cleanText(txt))}</pre>`;p.appendChild(d)}
+  for(const ep of t.eps){
+    const d=document.createElement("details");d.className="box";
+    d.innerHTML=`<summary>原始数据 · /api/station/EPWA/${esc(ep.replace(".", " → "))}</summary>`;
+    const tr=document.createElement("div");tr.className="tree";
+    let filled=false;d.addEventListener("toggle",()=>{if(d.open&&!filled){filled=true;tr.appendChild(tree(getEp(ep)))}});
+    d.appendChild(tr);p.appendChild(d);
+  }
+  m.appendChild(p);
+}
+function cleanText(t){
+  const i=t.indexOf("聪明钱\nPRO\n");return (i>=0?t.slice(i+"聪明钱\nPRO\n".length):t).trim();
+}
+
+/* ---------- profile (interactive) ---------- */
+const tip=$("tip");const NS="http://www.w3.org/2000/svg";
+function el(n,a,p){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function tipOn(e,txt){e.addEventListener("pointermove",ev=>{tip.textContent=txt;tip.hidden=false;const w=tip.offsetWidth;tip.style.left=Math.min(ev.clientX+12,innerWidth-w-8)+"px";tip.style.top=(ev.clientY-30)+"px"});e.addEventListener("pointerleave",()=>tip.hidden=true)}
+function niceStep(span,n){const r=span/n,p=Math.pow(10,Math.floor(Math.log10(r))),m=r/p;return (m<=1?1:m<=2?2:m<=2.5?2.5:m<=5?5:10)*p}
+const fmt=v=>Math.abs(v)<1e-9?"0":(Math.round(v*100)/100).toString();
+const sgn=v=>v>0?"+"+v:String(v);
+function signedBars(host,vals,labels,colorFn,unit){
+  host.innerHTML="";const W=440,H=200,L=40,R=8,T=10,B=26,pw=W-L-R,ph=H-T-B;
+  let lo=Math.min(0,...vals),hi=Math.max(0,...vals);const step=niceStep(Math.max(hi-lo,0.5),4);
+  lo=Math.floor(lo/step)*step;hi=Math.ceil(hi/step)*step;if(hi===lo)hi=lo+step;
+  const y=v=>T+(hi-v)/(hi-lo)*ph;const s=el("svg",{viewBox:`0 0 ${W} ${H}`},host);
+  for(let v=lo;v<=hi+1e-9;v+=step){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:Math.abs(v)<1e-9?"var(--dim)":"var(--grid)"},s);el("text",{x:L-6,y:y(v)+3,"text-anchor":"end"},s).textContent=fmt(v)}
+  const bw=pw/vals.length;
+  vals.forEach((v,i)=>{el("rect",{x:L+i*bw+bw*.15,y:y(Math.max(v,0)),width:bw*.7,height:Math.max(Math.abs(y(v)-y(0)),v?1:0),fill:colorFn(v)},s);
+    const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);tipOn(hit,`${labels[i]}  ${sgn(v)}${unit}`);
+    el("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"},s).textContent=labels[i]});
+}
+function htdChart(host,vals){
+  host.innerHTML="";const labs=["<09","09-12","12-14","14-16","16-18","18-20","20+"];
+  const W=440,H=200,L=40,R=8,T=10,B=26,pw=W-L-R,ph=H-T-B;const hi=Math.max(15,Math.ceil(Math.max(...vals)/15)*15);
+  const y=v=>T+(hi-v)/hi*ph;const s=el("svg",{viewBox:`0 0 ${W} ${H}`},host);
+  for(let v=0;v<=hi;v+=15){el("line",{x1:L,x2:W-R,y1:y(v),y2:y(v),stroke:"var(--grid)"},s);el("text",{x:L-6,y:y(v)+3,"text-anchor":"end"},s).textContent=v+"%"}
+  const mx=Math.max(...vals),bw=pw/vals.length;
+  vals.forEach((v,i)=>{el("rect",{x:L+i*bw+bw*.15,y:y(v),width:bw*.7,height:y(0)-y(v),fill:v===mx?"var(--accent)":"var(--accent-dim)"},s);
+    const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);tipOn(hit,`${labs[i]}  ${v}%`);
+    el("text",{x:L+i*bw+bw/2,y:H-8,"text-anchor":"middle"},s).textContent=labs[i]});
+}
+function hourChart(host,gain,prob){
+  host.innerHTML="";const idx=HOURS.map((h,i)=>i).filter(i=>HOURS[i]>=9&&HOURS[i]<=19);
+  const W=440,H=200,L=26,R=38,T=10,B=26,pw=W-L-R,ph=H-T-B;const g=idx.map(i=>gain[i]),p=idx.map(i=>prob[i]);
+  const gh=Math.max(2,Math.ceil(Math.max(...g)/2)*2);const yg=v=>T+(gh-v)/gh*ph,yp=v=>T+(100-v)/100*ph;
+  const s=el("svg",{viewBox:`0 0 ${W} ${H}`},host);
+  for(let v=0;v<=gh;v+=2){el("line",{x1:L,x2:W-R,y1:yg(v),y2:yg(v),stroke:"var(--grid)"},s);el("text",{x:L-6,y:yg(v)+3,"text-anchor":"end"},s).textContent=v}
+  for(let v=0;v<=100;v+=25)el("text",{x:W-R+6,y:yp(v)+3},s).textContent=v+"%";
+  const bw=pw/g.length,cx=i=>L+i*bw+bw/2;
+  g.forEach((v,i)=>el("rect",{x:L+i*bw+bw*.12,y:yg(v),width:bw*.76,height:yg(0)-yg(v),fill:"var(--accent-dim)"},s));
+  const pts=p.map((v,i)=>[cx(i),yp(v)]);let d=`M${pts[0][0]},${pts[0][1]}`;
+  for(let i=0;i<pts.length-1;i++){const p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||p2;
+    const c1y=Math.min(Math.max(p1[1]+(p2[1]-p0[1])/6,T),T+ph),c2y=Math.min(Math.max(p2[1]-(p3[1]-p1[1])/6,T),T+ph);
+    d+=` C${p1[0]+(p2[0]-p0[0])/6},${c1y} ${p2[0]-(p3[0]-p1[0])/6},${c2y} ${p2[0]},${p2[1]}`}
+  el("path",{d,fill:"none",stroke:"var(--accent)","stroke-width":1.8},s);pts.forEach(q=>el("circle",{cx:q[0],cy:q[1],r:3,fill:"var(--accent)"},s));
+  idx.forEach((hi,i)=>{const hit=el("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"transparent"},s);
+    tipOn(hit,`${String(HOURS[hi]).padStart(2,"0")}:00 后  +${gain[hi]}°C · 新高 ${prob[hi]}%`);
+    el("text",{x:cx(i),y:H-8,"text-anchor":"middle","font-size":9},s).textContent=String(HOURS[hi]).padStart(2,"0")+":00"});
+}
+function table(head,rows){return "<table><thead><tr>"+head.map(h=>`<th>${h}</th>`).join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+r.map(c=>`<td>${c}</td>`).join("")+"</tr>").join("")+"</tbody></table>"}
+
+function renderProfile(){
+  const m=$("main");
+  m.innerHTML=`<div class="panel">
+   <div><h2>升温画像</h2><p class="sub">基于多年历史 METAR 学习出的站点升温规律。</p></div>
+   <div class="months" id="months"></div>
+   <section class="cards" id="statCards"></section>
+   <section><h2>太阳</h2><p class="sub">当地时间，从本月 1 日到月末。</p><div class="cards" id="sunCards" style="margin-top:12px"></div></section>
+   <section class="sum"><h2>一句话总结</h2><ul id="summary"></ul></section>
+   <section class="grid">
+    <div class="chart"><h3>当日最高通常出现的时间</h3><div id="cHTD"></div><details class="vals"><summary>查看数值</summary><div class="tbl" id="tHTD"></div></details></div>
+    <div class="chart"><h3>每个小时之后还剩多少升温</h3><p class="sub" style="margin:0">在给定当地小时之后，平均还会升温多少度，以及出现新高的概率。</p>
+      <div class="legend"><span><i style="background:var(--accent-dim)"></i>平均剩余升温 °C（左轴）</span><span><i style="background:var(--accent);height:3px;vertical-align:3px"></i>之后出现新高概率（右轴）</span></div>
+      <div id="cHour"></div><details class="vals"><summary>查看数值</summary><div class="tbl" id="tHour"></div></details></div>
+    <div class="chart"><h3>哪种风让白天更暖</h3><p class="sub" style="margin:0">各风向下，当日最高温比平常高或低多少 —— 已按季节内时间校正。</p><div id="cWarm"></div><details class="vals"><summary>查看数值</summary><div class="tbl" id="tWarm"></div></details></div>
+    <div class="chart"><h3>最高温出现时间 — 按风向</h3><p class="sub" style="margin:0">各风向下，当日最高温比平常提前（−）或推迟（+）多少。</p><div id="cShift"></div><details class="vals"><summary>查看数值</summary><div class="tbl" id="tShift"></div></details></div>
+   </section>
+   <p class="foot" id="foot"></p>
+   <details class="box"><summary>原始数据 · /api/station/EPWA/passport</summary><div class="tree" id="ppTree"></div></details>
+  </div>`;
+  const mb=$("months");
+  for(let i=1;i<=12;i++){const b=document.createElement("button");b.type="button";b.textContent=i+"月";b.dataset.m=i;b.onclick=()=>drawMonth(i);mb.appendChild(b)}
+  const d=document.querySelector("#ppTree").parentElement;let f=false;d.addEventListener("toggle",()=>{if(d.open&&!f){f=true;$("ppTree").appendChild(tree(DATA.endpoints.passport))}});
+  let start=new Date().getMonth()+1;try{const v=+localStorage.getItem("epwa-month");if(v>=1&&v<=12)start=v}catch(e){}
+  drawMonth(start);
+}
+function drawMonth(mo){
+  const M=DATA.endpoints.passport.months[String(mo)],d=M.daily_temperature_behavior,s=M.sun;
+  document.querySelectorAll("#months button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m==mo?"true":"false"));
+  const summ=DATA.profile_summaries[mo+"月"]||[];
+  const yrs=M.years.length?`${M.years[0]}–${M.years[M.years.length-1]}`:"";
+  $("statCards").innerHTML=`
+   <div class="card"><div class="k">峰值升温速率</div><div class="v acc">${d.typical_heating_rate_c_per_h.toFixed(2)}°C/h</div></div>
+   <div class="card"><div class="k">典型最高</div><div class="v">${Math.round(d.typical_max_c)}°C</div><div class="n">通常 ${Math.round(d.max_p10_c)}–${Math.round(d.max_p90_c)}°C · 纪录 ${d.record_max_c}°C（${String(d.record_max_date).slice(0,4)}）</div></div>
+   <div class="card"><div class="k">常见峰值</div><div class="v">${d.peak_time_local}</div><div class="n">半数日子 ${d.peak_range_local[0]}–${d.peak_range_local[1]}</div></div>
+   <div class="card"><div class="k">样本</div><div class="v">${M.days_count} 天</div><div class="n">${yrs}</div></div>`;
+  const lagLine=summ.find(x=>x.includes("太阳正午"))||"";const lag=lagLine.split("之后 ")[1]||"";
+  $("sunCards").innerHTML=`
+   <div class="card"><div class="k">日出</div><div class="v mono">${s.first.sunrise}→${s.last.sunrise}</div></div>
+   <div class="card"><div class="k">日落</div><div class="v mono">${s.first.sunset}→${s.last.sunset}</div></div>
+   <div class="card"><div class="k">太阳正午</div><div class="v mono">${s.mid.solar_noon}</div><div class="n" style="font-family:var(--sans)">${lag?"最高温约晚 "+lag:""}</div></div>
+   <div class="card"><div class="k">昼长（时:分）</div><div class="v mono">${s.first.day_length}→${s.last.day_length}</div></div>`;
+  $("summary").innerHTML=summ.map(t=>`<li>${esc(t)}</li>`).join("");
+  const h=d.high_time_distribution,htd=["before_09","h09_12","h12_14","h14_16","h16_18","h18_20","after_20"].map(k=>h[k]??0);
+  htdChart($("cHTD"),htd);
+  $("tHTD").innerHTML=table(["时段","<09","09–12","12–14","14–16","16–18","18–20","20+"],[["占比 %",...htd]]);
+  const gain=HOURS.map(x=>d.by_hour[x]?.avg_gain_c??0),prob=HOURS.map(x=>d.by_hour[x]?Math.round((100-d.by_hour[x].printed_pct)*10)/10:0);
+  hourChart($("cHour"),gain,prob);
+  $("tHour").innerHTML=table(["当地时刻","剩余升温 °C","之后新高概率 %","样本"],HOURS.map((x,i)=>[String(x).padStart(2,"0")+":00",gain[i],prob[i],d.by_hour[x]?.n??""]));
+  const W=M.wind_direction_marginals,labs=DIRS.map(x=>x[1]);
+  const warm=DIRS.map(([k])=>W[k]?.avg_daily_max_anomaly_c??0),shift=DIRS.map(([k])=>W[k]?.peak_hour_shift_h??0),days=DIRS.map(([k])=>W[k]?.unique_days??"");
+  signedBars($("cWarm"),warm,labs,v=>v>=0?"var(--accent)":"var(--neg)","°C");
+  signedBars($("cShift"),shift,labs,()=>"var(--time)"," h");
+  $("tWarm").innerHTML=table(["风向","最高温距平 °C","样本天数"],labs.map((n,i)=>[n,sgn(warm[i]),days[i]]));
+  $("tShift").innerHTML=table(["风向","峰值时间偏移 h","样本天数"],labs.map((n,i)=>[n,sgn(shift[i]),days[i]]));
+  const a=mo===1?12:mo-1,b=mo===12?1:mo+1;
+  $("foot").textContent=`风向为白天升温时段（当地11–16时）的主导风；合并 ${a}月–${b}月 的数据，以保证每个方向有足够天数。`;
+  try{localStorage.setItem("epwa-month",mo)}catch(e){}
+}
+
+/* ---------- boot ---------- */
+function show(id){
+  const t=TABS.find(x=>x.id===id)||TABS[0];
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.id===t.id?"true":"false"));
+  if(t.id==="profile")renderProfile();else renderGeneric(t);
+}
+const nav=$("tabs");
+for(const t of TABS){const b=document.createElement("button");b.type="button";b.role="tab";b.dataset.id=t.id;b.textContent=t.name;b.onclick=()=>{location.hash=t.id};nav.appendChild(b)}
+fetch("epwa-data.json").then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(j=>{
+  DATA=j;
+  $("captured").textContent="数据抓取于 "+j.captured_local;
+  const sn=j.endpoints.snapshot||{};
+  if(sn.current_temp_c!=null)$("nowT").textContent=Math.round(sn.current_temp_c)+"°C";
+  $("nowS").textContent="抓取时的实况";
+  const go=()=>show(location.hash.slice(1)||"profile");window.addEventListener("hashchange",go);go();
+}).catch(e=>{$("main").innerHTML=`<div class="loading">数据文件载入失败（${esc(e.message)}）。请稍后刷新。</div>`});
+</script>
+</body>
+</html>
